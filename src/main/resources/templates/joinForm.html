@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 페이지</title>
+</head>
+
+<style>
+    div {
+        margin-bottom: 10px;
+    }
+</style>
+
+<script th:inline="javascript">
+    var message = /*[[${message}]]*/ null;
+    if (message) {
+        alert(message);
+    }
+</script>
+
+
+<body>
+<h1>회원가입 페이지</h1>
+<hr/>
+<form th:action="@{/join}" method="POST" th:object="${user}">
+    <div>
+        <label >*: 필수입력: </label>
+    </div>
+
+    <div>
+        <label >*이름: </label>
+        <input type="text" name="name" placeholder="Name" th:value="${user.name}"/>
+        <span th:text="${valid_name}"></span>
+    </div>
+    <div>
+        <label >*닉네임: </label>
+        <input type="text" name="nickname" placeholder="NickName" th:value="${user.nickname}"/>
+        <span th:text="${valid_nickname}"></span>
+    </div>
+    <div>
+        <label >*아이디: </label>
+        <input type="text" name="userId" placeholder="UserId" th:value="${user.userId}"/>
+        <span th:text="${valid_userId}"></span>
+    </div>
+    <div>
+        <label >*비밀번호: </label>
+        <input type="password" name="password" placeholder="Password"/>
+        <span th:text="${valid_password}"></span>
+    </div>
+    <div>
+        <label >*이메일: </label>
+        <input type="email" name="email" placeholder="Email" th:value="${user.email}"/>
+        <span th:text="${valid_email}"></span>
+    </div>
+
+    <button>회원가입</button>
+</form>
+</body>
+</html>

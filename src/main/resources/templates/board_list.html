@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>게시물 리스트 페이지</title>
+</head>
+
+<style>
+
+   .layout {
+        width : 500px;
+        margin : 0 auto;
+        margin-top : 40px;
+   }
+</style>
+
+<body>
+
+<div class="layout">
+  <table>
+    <thead>
+    <tr>
+      <th>글번호</th>
+      <th>제목</th>
+      <th>시간</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="post : ${list}">   <!-- 반복문. 없을때까지 반복함. -->
+      <td th:text="${post.id}">1</td>
+      <td th:text="${post.title}" >  <!--<a th:href ~~~>는 연결시켜주는 것. 클릭을 가능 --></td>
+      <td th:text="${post.created_time}">시간입니다.</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
+</body>
+</html>

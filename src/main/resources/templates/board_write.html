@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>게시물 작성폼</title>
+</head>
+
+<style>
+
+    .layout {
+        width : 500px;
+        margin : 0 auto;
+        margin-top : 40px;
+    }
+
+    .layout input {
+        width : 100%;
+        box-sizing : border-box;
+    }
+
+    .layout textarea {
+        width : 100%;
+        margin-top : 10px;
+        min-height : 300px;
+    }
+
+</style>
+
+<body>
+<div class="layout">
+    <form action="/api/post/write" method="post" enctype="multipart/form-data">  <!-- 3. action에 지정된 곳으로 전달. -->
+        <th>제목</th>
+        <input name="title" type="text">      <!-- 2. 이 내용과 -->
+        <th>내용</th>
+        <textarea name="content"></textarea>   <!-- 2. 이 내용이 -->
+        <input type="file" name="file">
+        <button type="submit">작성</button>  <!-- 1. 버튼을 누르면 -->
+    </form>
+</div>
+
+</body>
+</html>

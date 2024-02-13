@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 페이지</title>
+</head>
+<body>
+<h1>로그인 페이지</h1>
+<hr/>
+<form action="/login" method="POST">  <!--로그인 할 시 SecurityConfig.java에서 .loginProcessingUrl("/login") 설정해 시큐리티가 낚아챔.-->
+    아이디 : <input type="text" name="userId" placeholder="UserId" /> <br/>
+    비밀번호 : <input type="password" name="password" placeholder="Password"/> <br/>
+    <input type="checkbox" id="rememberMe" name="rememberMe"/> 로그인 상태 유지 <br/>
+    <button>로그인</button>
+    <span th:text="${exception}"></span>
+</form>
+
+<a href="/oauth2/authorization/google">구글 로그인</a>   <!-- oauth-client 라이브러리를 쓰면 고저으로 사용되는 주소 마음대로 못바꿈. -->
+<a href="/oauth2/authorization/facebook">페이스북 로그인</a>   <!-- oauth-client 라이브러리를 쓰면 고저으로 사용되는 주소 마음대로 못바꿈. -->
+<a href="/oauth2/authorization/naver">네이버 로그인</a>       <!-- 클릭하면 실제로 application.yml에서 authorization-uri에 적혀있는 주소로 호출됨. -->
+<a href="/joinForm">회원가입을 아직 하지 않으셨나요?</a>
+
+
+</body>
+</html>
+

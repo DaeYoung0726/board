@@ -3,6 +3,7 @@ package com.Board.project_board.controller;
 import com.Board.project_board.config.auth.PrincipalDetails;
 import com.Board.project_board.dto.UserDto;
 import com.Board.project_board.entity.Post;
+import com.Board.project_board.mail.MailService;
 import com.Board.project_board.service.PostService;
 import com.Board.project_board.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class PostController_REST {
 
     private final PostService postService;
     private final UserService userService;
+    private final MailService mailService;
 
     // create
     @PostMapping("/post/{category_name}/write")
@@ -45,6 +47,8 @@ public class PostController_REST {
             UserDto.Response dto = userService.findById(principalDetails.getUser().getId());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
                 userService.roleUpdate(dto.getId());
+                mailService.selectMail("update", principalDetails.getUser().getEmail(),
+                        String.valueOf(principalDetails.getUser().getRole().getNext()));
                 log.info("User {} has been upgraded to the next role level", principalDetails.getUsername());
                 return ResponseEntity.ok("게시글 작성 + 회원 등업 완료.");
             }

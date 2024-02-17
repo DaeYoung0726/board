@@ -1,0 +1,55 @@
+package com.Board.project_board.mail;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class MailService {
+
+    private final JavaMailSender javaMailSender;
+    private final String updateTitle = "[board] 회원님의 등급이 업데이트 되었습니다.";
+    private final String updateText = "로 업데이트 되었습니다!";
+    private final String certifyTitle = "[board] 회원가입 인증 메일입니다.";
+    private final String certifyText = "인증번호 = ";
+    @Value("${spring.mail.username}")
+    private String emailUsername;
+
+    /* 메일 유형 선택 */
+    public void selectMail(String select, String email, String text) {
+        switch (select) {
+            case "update" -> sendMail(email, updateTitle, text + updateText);
+            case "certify" -> sendMail(email, certifyTitle, certifyText + text);
+            default -> throw new IllegalArgumentException("Invalid select value: " + select);
+        }
+    }
+
+    /* 메일 보내기 */
+    private void sendMail(String email, String title, String text) {
+
+        SimpleMailMessage message = getMessage(email, title, text);
+        try {
+            javaMailSender.send(message);
+        } catch (MailException e) {
+            log.error("Failed to send email: {}", e.getMessage());
+        }
+    }
+
+    /* 메일 구성하기 */
+    private SimpleMailMessage getMessage(String email, String title, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject(title);
+        message.setText(text);
+        message.setFrom(emailUsername);     // 네이버는 From 지정안해주면 안보내짐.
+        return message;
+    }
+}

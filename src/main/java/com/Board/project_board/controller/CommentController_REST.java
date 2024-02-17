@@ -3,6 +3,7 @@ package com.Board.project_board.controller;
 import com.Board.project_board.config.auth.PrincipalDetails;
 import com.Board.project_board.dto.CommentDto;
 import com.Board.project_board.dto.UserDto;
+import com.Board.project_board.mail.MailService;
 import com.Board.project_board.service.CommentService;
 import com.Board.project_board.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class CommentController_REST {
 
     private final CommentService commentService;
     private final UserService userService;
+    private final MailService mailService;
 
     /* create */
     @PostMapping("/post/{id}/comment")
@@ -35,6 +37,8 @@ public class CommentController_REST {
             UserDto.Response dto = userService.findById(principalDetails.getUser().getId());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
                 userService.roleUpdate(dto.getId());
+                mailService.selectMail("update", principalDetails.getUser().getEmail(),
+                        String.valueOf(principalDetails.getUser().getRole().getNext()));
                 log.info("User {} has been upgraded to the next role level", principalDetails.getUsername());
                 return ResponseEntity.ok("댓글 작성 + 회원 등업 완료.");
             }

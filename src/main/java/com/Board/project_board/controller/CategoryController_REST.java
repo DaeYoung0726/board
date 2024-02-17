@@ -3,12 +3,14 @@ package com.Board.project_board.controller;
 import com.Board.project_board.dto.CategoryDto;
 import com.Board.project_board.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class CategoryController_REST {
@@ -19,9 +21,12 @@ public class CategoryController_REST {
     @PostMapping("/category/create")
     public ResponseEntity<String> create(@RequestBody CategoryDto.Request dto) {
         try {
+
             categoryService.save(dto);
+            log.info("Category '{}' successfully created.", dto.getName());
             return ResponseEntity.ok("카테고리 생성 성공.");
         } catch (Exception e) {
+            log.error("Failed to create category '{}'.", dto.getName(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카테고리 생성 실패.");
         }
     }
@@ -38,8 +43,10 @@ public class CategoryController_REST {
                                          @RequestBody CategoryDto.Request dto) {
         try {
             categoryService.update(category_name, dto);
+            log.info("Category '{}' successfully updated.", category_name);
             return ResponseEntity.ok("카테고리 업데이트 성공.");
         } catch (Exception e) {
+            log.error("Failed to update category '{}'.", category_name, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카테고리 업데이트 실패.");
         }
     }
@@ -49,8 +56,10 @@ public class CategoryController_REST {
     public ResponseEntity<String> update(@PathVariable String category_name) {
         try {
             categoryService.delete(category_name);
+            log.info("Category '{}' successfully deleted.", category_name);
             return ResponseEntity.ok("카테고리 삭제 성공.");
         } catch (Exception e) {
+            log.error("Failed to delete category '{}'.", category_name, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("카테고리 삭제 실패.");
         }
     }

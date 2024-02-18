@@ -1,4 +1,4 @@
-package com.Board.project_board.mail;
+package com.Board.project_board.service.mail;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package com.Board.project_board.service;
 
 import com.Board.project_board.dto.UserDto;
 import com.Board.project_board.entity.User;
-import com.Board.project_board.mail.MailService;
+import com.Board.project_board.service.mail.MailService;
 import com.Board.project_board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

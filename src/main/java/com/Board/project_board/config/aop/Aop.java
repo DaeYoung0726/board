@@ -1,18 +1,16 @@
-package com.Board.project_board.mail;
+package com.Board.project_board.config.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
 @Slf4j
-public class aop {
+public class Aop {
 
     @Around("execution(* com.Board.project_board.service.*.*(..))")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -28,4 +26,3 @@ public class aop {
         return result;
     }
 }
-

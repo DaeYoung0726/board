@@ -3,7 +3,7 @@ package com.Board.project_board.controller;
 import com.Board.project_board.config.auth.PrincipalDetails;
 import com.Board.project_board.dto.CommentDto;
 import com.Board.project_board.dto.UserDto;
-import com.Board.project_board.mail.MailService;
+import com.Board.project_board.service.mail.MailService;
 import com.Board.project_board.service.CommentService;
 import com.Board.project_board.service.UserService;
 import lombok.RequiredArgsConstructor;

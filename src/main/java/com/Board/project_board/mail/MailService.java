@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
+@EnableAsync        // 비동기 처리를 위해.
 public class MailService {
 
     private final JavaMailSender javaMailSender;
@@ -24,6 +27,7 @@ public class MailService {
     private String emailUsername;
 
     /* 메일 유형 선택 */
+    @Async  // 메일 보내기 비동기 처리. 메일을 보내는 동안 다른걸 할 수 있도록.
     public void selectMail(String select, String email, String text) {
         switch (select) {
             case "update" -> sendMail(email, updateTitle, text + updateText);

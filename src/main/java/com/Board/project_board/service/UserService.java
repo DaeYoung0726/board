@@ -1,20 +1,19 @@
 package com.Board.project_board.service;
 
-import com.Board.project_board.dto.PostDto;
 import com.Board.project_board.dto.UserDto;
-import com.Board.project_board.entity.Post;
 import com.Board.project_board.entity.User;
+import com.Board.project_board.mail.MailService;
 import com.Board.project_board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MailService mailService;
 
     // 회원가입
     @Transactional
@@ -119,10 +119,32 @@ public class UserService {
 
     /* 등업 확인을 위한 메서드. */
     public boolean checkRoleUpgrade(UserDto.Response dto) {
-        if(dto.getRole().getValue().equals("ROLE_BRONZE") && dto.getPostSize() >= 10 && dto.getCommentSize() >= 20)
+        if(dto.getRole().getValue().equals("ROLE_BRONZE") && dto.getPostSize() >= 1 && dto.getCommentSize() >= 2)
             return true;
         if(dto.getRole().getValue().equals("ROLE_SILVER") && dto.getPostSize() >= 30 && dto.getCommentSize() >= 60)
             return true;
         return false;
+    }
+
+
+    /* 회원가입 이메일 인증 번호. */
+    public void sendCodeToMail(String email) {
+        String code = createCode();
+        mailService.selectMail("certify", email, code);
+    }
+
+    private String createCode() {
+
+        try {
+            Random random = SecureRandom.getInstanceStrong();   // 암호학적으로 안전한 무작위 수를 생성. 인증번호는 보안적으로 중요하기 SecureRandom 사용.
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < 6; i++) {
+                sb.append(random.nextInt(10));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            log.info("Failed to create secure random instance", e);
+            throw new RuntimeException("Failed to generate secure random number", e);
+        }
     }
 }

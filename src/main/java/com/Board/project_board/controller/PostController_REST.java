@@ -2,7 +2,6 @@ package com.Board.project_board.controller;
 
 import com.Board.project_board.config.auth.PrincipalDetails;
 import com.Board.project_board.dto.UserDto;
-import com.Board.project_board.entity.Post;
 import com.Board.project_board.mail.MailService;
 import com.Board.project_board.service.PostService;
 import com.Board.project_board.service.UserService;
@@ -21,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Board.project_board.dto.PostDto;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor

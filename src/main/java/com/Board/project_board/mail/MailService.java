@@ -1,4 +1,4 @@
-package com.Board.project_board.service;
+package com.Board.project_board.mail;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class MailService {
     private String emailUsername;
 
     /* 메일 유형 선택 */
-    @Async
+    @Async  // 메일 보내기 비동기 처리. 메일을 보내는 동안 다른걸 할 수 있도록.
     public void selectMail(String select, String email, String text) {
         switch (select) {
             case "update" -> sendMail(email, updateTitle, text + updateText);
@@ -37,7 +37,6 @@ public class MailService {
     }
 
     /* 메일 보내기 */
-      // 메일 보내기 비동기 처리. 메일을 보내는 동안 다른걸 할 수 있도록.ㅋ
     private void sendMail(String email, String title, String text) {
 
         SimpleMailMessage message = getMessage(email, title, text);

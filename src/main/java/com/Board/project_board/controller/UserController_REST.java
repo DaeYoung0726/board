@@ -61,6 +61,5 @@ public class UserController_REST {
             return "인증 성공";
         else
             return "인증 실패";
-
     }
 }

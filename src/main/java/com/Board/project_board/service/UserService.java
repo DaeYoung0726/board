@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MailService mailService;
+    private final Map<String, String> codeMap = new ConcurrentHashMap<>();  // 메일 인증번호 확인용.
 
     // 회원가입
     @Transactional
@@ -130,7 +132,8 @@ public class UserService {
     /* 회원가입 이메일 인증 번호. */
     public void sendCodeToMail(String email) {
         String code = createCode();
-        mailService.selectMail("certify", email, code);
+        mailService.selectMail("verify", email, code);
+        codeMap.put(email, code);
     }
 
     /* 인증번호 만드는 메서드. */
@@ -147,5 +150,15 @@ public class UserService {
             log.info("Failed to create secure random instance", e);
             throw new RuntimeException("Failed to generate secure random number", e);
         }
+    }
+
+    /* 인증번호 확인 메서드. */
+    public boolean verifiedCode(String email, String code) {
+        String storedCode = codeMap.get(email);
+        if(storedCode.equals(code)) {
+            codeMap.remove(email);      // 인증코드가 맞다면 인증코드 삭제.
+            return true;
+        } else
+            return false;
     }
 }

@@ -21,8 +21,8 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     private final String updateTitle = "[board] 회원님의 등급이 업데이트 되었습니다.";
     private final String updateText = "로 업데이트 되었습니다!";
-    private final String certifyTitle = "[board] 회원가입 인증 메일입니다.";
-    private final String certifyText = "인증번호 = ";
+    private final String verifyTitle = "[board] 회원가입 인증 메일입니다.";
+    private final String verifyText = "인증번호 = ";
     @Value("${spring.mail.username}")
     private String emailUsername;
 
@@ -31,7 +31,7 @@ public class MailService {
     public void selectMail(String select, String email, String text) {
         switch (select) {
             case "update" -> sendMail(email, updateTitle, text + updateText);
-            case "certify" -> sendMail(email, certifyTitle, certifyText + text);
+            case "verify" -> sendMail(email, verifyTitle, verifyText + text);
             default -> throw new IllegalArgumentException("Invalid select value: " + select);
         }
     }

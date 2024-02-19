@@ -133,6 +133,7 @@ public class UserService {
         mailService.selectMail("certify", email, code);
     }
 
+    /* 인증번호 만드는 메서드. */
     private String createCode() {
 
         try {

@@ -31,7 +31,6 @@ public class UserService {
     // 회원가입
     @Transactional
     public Long create(UserDto.Request dto) {
-
         log.info("Creating user with username: {}", dto.getUserId());
         dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         User user = dto.toEntity();

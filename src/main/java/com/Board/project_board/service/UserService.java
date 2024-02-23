@@ -53,7 +53,6 @@ public class UserService {
     }
 
     /* 아이디 중복 확인. */
-    @Transactional(readOnly = true)
     public boolean existsByUserId(String userId) {
 
         log.info("Checking if user exists by user ID: {}", userId);

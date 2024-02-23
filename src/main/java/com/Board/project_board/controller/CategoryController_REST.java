@@ -23,7 +23,6 @@ public class CategoryController_REST {
         try {
 
             categoryService.save(dto);
-            log.info("Category '{}' successfully created.", dto.getName());
             return ResponseEntity.ok("카테고리 생성 성공.");
         } catch (Exception e) {
             log.error("Failed to create category '{}'.", dto.getName(), e);
@@ -43,7 +42,6 @@ public class CategoryController_REST {
                                          @RequestBody CategoryDto.Request dto) {
         try {
             categoryService.update(category_name, dto);
-            log.info("Category '{}' successfully updated.", category_name);
             return ResponseEntity.ok("카테고리 업데이트 성공.");
         } catch (Exception e) {
             log.error("Failed to update category '{}'.", category_name, e);
@@ -56,7 +54,6 @@ public class CategoryController_REST {
     public ResponseEntity<String> update(@PathVariable String category_name) {
         try {
             categoryService.delete(category_name);
-            log.info("Category '{}' successfully deleted.", category_name);
             return ResponseEntity.ok("카테고리 삭제 성공.");
         } catch (Exception e) {
             log.error("Failed to delete category '{}'.", category_name, e);

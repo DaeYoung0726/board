@@ -44,7 +44,6 @@ public class UserController_REST {
 
         try {
             userService.sendCodeToMail(email);
-            log.info("Successfully sent verification email to {}", email);
             return ResponseEntity.ok("인증메일 보내기 성공.");
         } catch (Exception e) {
             log.error("Failed to send verification email: {}", e.getMessage(), e);

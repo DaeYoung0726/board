@@ -61,7 +61,6 @@ public class UserService {
     }
 
     /* 닉네임 중복 확인. */
-    @Transactional(readOnly = true)
     public boolean existsByNickname(String nickname) {
 
         log.info("Checking if user exists by nickname: {}", nickname);
@@ -69,14 +68,13 @@ public class UserService {
     }
 
     /* 이메일 중복 확인 */
-    @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
 
         log.info("Checking if user exists by email: {}", email);
         return userRepository.existsByEmail(email);
     }
 
-    /* 사용자 전체 읽기. 번호, 이름, 아이디, 닉네임, 이메일, 권한만 가지고 옴. */
+    /* 사용자 전체 읽기. */
     @Transactional(readOnly = true)
     public List<UserDto.Response> findAll() {
 

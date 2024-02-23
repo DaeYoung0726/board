@@ -32,14 +32,12 @@ public class CommentController_REST {
         try {
 
             commentService.save(comment, principalDetails.getUser().getId(), id);
-            log.info("Comment successfully saved by user {} on post {}", principalDetails.getUsername(), id);
 
             UserDto.Response dto = userService.findById(principalDetails.getUser().getId());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
                 userService.roleUpdate(dto.getId());
                 mailService.selectMail("update", principalDetails.getUser().getEmail(),
                         String.valueOf(principalDetails.getUser().getRole().getNext()));
-                log.info("User {} has been upgraded to the next role level", principalDetails.getUsername());
                 return ResponseEntity.ok("댓글 작성 + 회원 등업 완료.");
             }
             return ResponseEntity.ok("댓글 작성 완료.");
@@ -61,7 +59,6 @@ public class CommentController_REST {
         try {
 
             commentService.update(post_id, id, dto);
-            log.info("Comment with ID {} on post {} was updated", id, post_id);
             return ResponseEntity.ok("댓글 수정 완료.");
         } catch(Exception e) {
             log.error("Failed to update comment with ID {} on post {}", id, post_id, e);
@@ -75,7 +72,6 @@ public class CommentController_REST {
 
         try {
             commentService.delete(post_id, id);
-            log.info("Comment with ID {} on post {} was deleted", id, post_id);
             return ResponseEntity.ok("댓글 삭제 완료.");
         } catch(Exception e) {
             log.error("Failed to delete comment with ID {} on post {}", id, post_id, e);

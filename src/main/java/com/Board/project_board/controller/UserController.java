@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,13 +61,13 @@ public class UserController {
     }
 
     @PostMapping("/join")
-    public String join(@Valid UserDto.Request user, Errors errors, Model model) {
+    public String join(@Valid UserDto.Request user, BindingResult bindingResult, Model model) {
         // 검증에 실패한 경우 joinForm으로 이동
-        if (errors.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);   // 회원가입 실패시, 입력 데이터를 유지
 
             /* 회원가입 실패시 message 값들을 모델에 매핑해서 View로 전달 */
-            Map<String, String> validateResult = userService.validateHandler(errors);
+            Map<String, String> validateResult = userService.validateHandler(bindingResult);
             // map.keySet() -> 모든 key값을 갖고온다.
             // 그 갖고온 키로 반복문을 통해 키와 에러 메세지로 매핑
             for (String key : validateResult.keySet()) {

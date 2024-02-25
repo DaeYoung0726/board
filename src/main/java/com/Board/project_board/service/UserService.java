@@ -42,14 +42,10 @@ public class UserService {
     }
 
     /* 회원가입 에러 확인. */
-    public Map<String, String> validateHandler(Errors errors) {
-        Map<String, String> validateResult = new HashMap<>();
-
+    public void validateHandler(Errors errors) {
         for (FieldError error : errors.getFieldErrors()) {
-            String validKeyName = "valid_" + error.getField();
-            validateResult.put(validKeyName, error.getDefaultMessage());
+            errors.rejectValue(String.valueOf(error), error.getDefaultMessage());
         }
-        return validateResult;
     }
 
     /* 아이디 중복 확인. */

@@ -2,6 +2,7 @@ package com.Board.project_board.controller;
 
 import com.Board.project_board.dto.UserDto;
 import com.Board.project_board.service.UserService;
+import com.Board.project_board.validator.UserValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -22,6 +24,12 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final UserValidator userValidator;
+
+    @InitBinder
+    public void init(WebDataBinder dataBinder) {
+        dataBinder.addValidators(userValidator);
+    }
 
     @GetMapping("/user")
     public @ResponseBody String user() {
@@ -60,53 +68,22 @@ public class UserController {
         return "joinForm";
     }
 
-    @PostMapping("/join")
+    @PostMapping("/joinForm")
     public String join(@Valid UserDto.Request user, BindingResult bindingResult, Model model) {
         // 검증에 실패한 경우 joinForm으로 이동
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);   // 회원가입 실패시, 입력 데이터를 유지
 
+            log.info("errors = {}", bindingResult);
             /* 회원가입 실패시 message 값들을 모델에 매핑해서 View로 전달 */
-            Map<String, String> validateResult = userService.validateHandler(bindingResult);
-            // map.keySet() -> 모든 key값을 갖고온다.
-            // 그 갖고온 키로 반복문을 통해 키와 에러 메세지로 매핑
-            for (String key : validateResult.keySet()) {
-                // ex) model.addAtrribute("valid_id", "아이디는 필수 입력사항 입니다.")
-                model.addAttribute(key, validateResult.get(key));
-            }
             model.addAttribute("message", "조건에 맞게 입력해주세요.");
             return "joinForm";
-            /**
-             * StringBuilder sb = new StringBuilder();      // 초기 식.
-             * for(FieldError error : errors.getFieldErrors())
-             *      sb.append(error.getDefaultMessage() + "\n");
-             *  model.addAttribute("message",sb);
-             *  model.addAttribute("searchUrl", "/joinForm");
-             */
         }
 
-        boolean exists = userService.existsByUserId(user.getUserId())
-                || userService.existsByNickname(user.getNickname()) || userService.existsByEmail(user.getEmail());
+        userService.create(user);
 
-        if(exists) {
-            model.addAttribute("user", user);
+        return "redirect:/loginForm";
 
-            StringBuilder sb = new StringBuilder();
-
-            if(userService.existsByUserId(user.getUserId()))
-                sb.append("아이디 중복." + "\n");
-            if(userService.existsByNickname(user.getNickname()))
-                sb.append("닉네임 중복." + "\n");
-            if(userService.existsByEmail(user.getEmail()))
-                sb.append("이메일 중복." + "\n");
-
-            model.addAttribute("message", sb);    // 세세히 나오도록 바꾸기
-            return "/joinForm";     // 중복 오류 뜬 것은 이전 입력값이 채워지지 않도록 만들어보기
-        } else {
-            userService.create(user);
-
-            return "redirect:/loginForm";
-        }
     }
 
     @GetMapping("/session-Info")            // 세션 확인용

@@ -22,10 +22,6 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
 
-        for (FieldError error : errors.getFieldErrors()) {
-            errors.rejectValue(error.getField(), error.getDefaultMessage());
-        }
-
         UserDto.Request dto = (UserDto.Request) target;
         if(userRepository.existsByUserId(dto.getUserId()))
             errors.rejectValue("userId", "이미 존재하는 아이디 입니다.");

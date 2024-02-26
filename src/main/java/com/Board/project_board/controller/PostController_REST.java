@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class PostController_REST {
 
     // create
     @PostMapping("/post/{category_name}/write")
-    public ResponseEntity<String> save(@RequestBody PostDto.Request post,
+    public ResponseEntity<String> save(@Validated @RequestBody PostDto.Request post,
                                        @PathVariable String category_name,
                                        @AuthenticationPrincipal PrincipalDetails principalDetails) {
         // @AuthenticationPrincipal을 사용해서 현재 인증된 로그인 정보를 객체로 만들어줌
@@ -63,16 +64,14 @@ public class PostController_REST {
 
     // read post
     @GetMapping("/post/{postId}")
-    public PostDto.Response findById(@PathVariable Long postId) {
-
-        return postService.findById(postId);
+    public PostDto.Response findById(@PathVariable Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        PostDto.Response post = postService.findById(postId);
+        if(post.getUser_id() != principalDetails.getUser().getId()) {
+            postService.updateView(postId);
+        }
+        return post;
     }
 
-    /* // read All       페이징 처리 x.
-    @GetMapping("/post")
-    public List<PostDTO.Response> findAll() {
-        return postService.getAll();
-    }*/
 
     /* 페이징 처리 read All (단어 검색 포함) */
     @GetMapping("/post")
@@ -99,10 +98,11 @@ public class PostController_REST {
 
     // update
     @PutMapping("/post/{postId}")
-    public ResponseEntity<String> modify(@PathVariable Long postId, @RequestBody PostDto.Request post) {
+    public ResponseEntity<String> modify(@PathVariable Long postId, @Validated @RequestBody PostDto.UpdateRequest dto,
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         try {
-            postService.update(postId, post);
+            postService.update(postId, principalDetails.getUser().getId(), dto);
             return ResponseEntity.ok("게시글 수정 완료.");
         } catch (Exception e) {
             log.error("Failed to update post with ID: {}", postId, e);

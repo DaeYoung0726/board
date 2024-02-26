@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class CategoryController_REST {
 
     /* 카테고리 생성 */
     @PostMapping("/category/create")
-    public ResponseEntity<String> create(@RequestBody CategoryDto.Request dto) {
+    public ResponseEntity<String> create(@Validated @RequestBody CategoryDto.Request dto) {
         try {
 
             categoryService.save(dto);
@@ -39,7 +40,7 @@ public class CategoryController_REST {
     /* 카테고리 업데이트 */
     @PutMapping("/category/{category_name}")
     public ResponseEntity<String> update(@PathVariable String category_name,
-                                         @RequestBody CategoryDto.Request dto) {
+                                         @Validated @RequestBody CategoryDto.Request dto) {
         try {
             categoryService.update(category_name, dto);
             return ResponseEntity.ok("카테고리 업데이트 성공.");

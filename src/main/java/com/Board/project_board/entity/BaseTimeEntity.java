@@ -1,6 +1,7 @@
 package com.Board.project_board.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,12 +18,12 @@ import java.time.format.DateTimeFormatter;
 // AuditingEntityListener.class : 생성일자와 수정일자를 자동으로 관리하기 위한 리스너. 자동으로 생성일과 수정일을 갱신
 abstract class BaseTimeEntity {
 
-    @NotNull
+    @NotBlank
     @Column(name = "created_date")
     @CreatedDate
     private String created_time;
 
-    @NotNull
+    @NotBlank
     @Column(name = "modified_date")
     @LastModifiedDate
     private String modified_time;

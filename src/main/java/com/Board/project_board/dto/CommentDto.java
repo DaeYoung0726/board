@@ -3,6 +3,7 @@ package com.Board.project_board.dto;
 import com.Board.project_board.entity.Comment;
 import com.Board.project_board.entity.Post;
 import com.Board.project_board.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 
@@ -13,6 +14,8 @@ public class CommentDto {
     @Setter @Getter
     @Builder
     public static class Request {
+
+        @NotBlank
         private String content;
         private Post post;
         private User user;
@@ -28,6 +31,17 @@ public class CommentDto {
             return comment;
         }
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter @Setter
+    @Builder
+    public static class UpdateRequest {     // 업데이트 전용 DTO
+
+        @NotBlank
+        private String content;
+    }
+
     @Getter
     public static class Response {
         private final Long id;

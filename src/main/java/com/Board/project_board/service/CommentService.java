@@ -89,11 +89,13 @@ public class CommentService {
 
     /* 댓글 업데이트. */
     @Transactional
-    public void update(Long post_id, Long id, CommentDto.Request dto) {  // update
+    public void update(Long post_id, Long user_id, Long id, CommentDto.UpdateRequest dto) {  // update
 
         log.info("Updating comment with ID: {}", id);
         Comment comment = commentRepository.findByPostIdAndId(post_id, id).orElseThrow(() ->
                 new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id: " + id));
+        if(comment.getUser().getId() != user_id)
+            throw new RuntimeException("권한이 없습니다.");
         comment.update(dto.getContent());
         log.info("Comment updated successfully");
     }

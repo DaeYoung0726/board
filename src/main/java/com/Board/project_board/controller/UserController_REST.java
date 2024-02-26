@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,13 +29,13 @@ public class UserController_REST {
     /* 회원 업데이트 */
     @PutMapping("/user/update")
     public ResponseEntity<String> modify(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                         @RequestBody UserDto.Request user, HttpServletResponse response) {
+                                         @Validated @RequestBody UserDto.UpdateRequest user, HttpServletResponse response) {
         try {
             userService.update(principalDetails.getUser().getId(), user);
             response.sendRedirect("/logout");           // 이 방식도 있겠지만, html도 있을듯.
             return ResponseEntity.ok("회원 수정 완료.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 수정 실패.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("회원 수정 실패.");
         }
     }
 

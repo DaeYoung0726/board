@@ -4,6 +4,7 @@ import com.Board.project_board.entity.Category;
 import com.Board.project_board.entity.Post;
 
 import com.Board.project_board.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -16,7 +17,10 @@ public class PostDto {
     @Getter @Setter
     @Builder
     public static class Request {
+
+        @NotBlank
         private String title;
+        @NotBlank
         private String content;
         private User user;
         private Category category;
@@ -39,6 +43,19 @@ public class PostDto {
             return post;
         }
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter @Setter
+    @Builder
+    public static class UpdateRequest {     // 업데이트 전용 DTO
+
+        @NotBlank
+        private String title;
+        @NotBlank
+        private String content;
+    }
+
     @Getter
     public static class Response {
         private final Long id;

@@ -14,11 +14,6 @@ public class FacebookUserInfo implements OAuth2UserInfo{
     }
 
     @Override
-    public String getProviderId() {
-        return (String) attributes.get("id");
-    }
-
-    @Override
     public String getUserId() {
         return (String) attributes.get("email");
     }

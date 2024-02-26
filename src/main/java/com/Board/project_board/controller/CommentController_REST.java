@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class CommentController_REST {
 
     /* create */
     @PostMapping("/post/{id}/comment")
-    public ResponseEntity<String> save(@PathVariable Long id,
-                               @AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody CommentDto.Request comment) {
+    public ResponseEntity<String> save(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principalDetails,
+                                       @Validated @RequestBody CommentDto.Request comment) {
         try {
 
             commentService.save(comment, principalDetails.getUser().getId(), id);
@@ -55,10 +56,12 @@ public class CommentController_REST {
 
     /* update */
     @PutMapping("/post/{post_id}/comment/{id}")
-    public ResponseEntity<String> update(@PathVariable Long post_id, @PathVariable Long id, @RequestBody CommentDto.Request dto) {
+    public ResponseEntity<String> update(@PathVariable Long post_id, @PathVariable Long id,
+                                         @Validated @RequestBody CommentDto.UpdateRequest dto,
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
 
-            commentService.update(post_id, id, dto);
+            commentService.update(post_id,principalDetails.getUser().getId(), id, dto);
             return ResponseEntity.ok("댓글 수정 완료.");
         } catch(Exception e) {
             log.error("Failed to update comment with ID {} on post {}", id, post_id, e);

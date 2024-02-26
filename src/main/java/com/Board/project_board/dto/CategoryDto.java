@@ -1,6 +1,7 @@
 package com.Board.project_board.dto;
 
 import com.Board.project_board.entity.Category;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class CategoryDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Request {
+
+        @NotBlank
         private String name;
 
         public Category toEntity() {

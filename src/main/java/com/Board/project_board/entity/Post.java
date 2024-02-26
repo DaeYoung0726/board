@@ -2,6 +2,7 @@ package com.Board.project_board.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -19,16 +20,16 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank
     @Column(name = "title")
     private String title;
 
-    @NotNull
+    @NotBlank
     @Column(name = "content")
     private String content;
 
 
-    @Column(name = "view", columnDefinition = "integer default 0")
+    @Column(name = "view")
     private int view;
 
     @Column(name = "likeCount")

@@ -93,13 +93,17 @@ public class PostService {
 
     /* 게시글 업데이트. */
     @Transactional
-    public void update(Long id, PostDto.Request dto) {  // update
+    public void update(Long id, Long user_Id, PostDto.UpdateRequest dto) {  // update
 
         log.info("Updating post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        post.update(dto.getTitle(), dto.getContent());
-        log.info("Post updated successfully");
+        if(post.getUser().getId() != user_Id)
+            throw new RuntimeException("권한이 없습니다.");
+        else {
+            post.update(dto.getTitle(), dto.getContent());
+            log.info("Post updated successfully");
+        }
     }
 
     /* 게시글 뷰 업데이트 */

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,14 +70,12 @@ public class UserController {
     }
 
     @PostMapping("/joinForm")
-    public String join(@Valid UserDto.Request user, BindingResult bindingResult, Model model) {
+    public String join(@Validated UserDto.Request user, BindingResult bindingResult, Model model) {
         // 검증에 실패한 경우 joinForm으로 이동
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);   // 회원가입 실패시, 입력 데이터를 유지
 
             log.info("errors = {}", bindingResult);
-            /* 회원가입 실패시 message 값들을 모델에 매핑해서 View로 전달 */
-            model.addAttribute("message", "조건에 맞게 입력해주세요.");
             return "joinForm";
         }
 
@@ -104,4 +103,3 @@ public class UserController {
 
     }
 }
-

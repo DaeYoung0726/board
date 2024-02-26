@@ -3,6 +3,7 @@ package com.Board.project_board.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -22,33 +23,32 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank
     @Column(name = "name")
     private String name;
 
-    @NotNull
+    @NotBlank
     @Column(name = "userid", unique = true)
     private String userId;
 
-    @NotNull
+    @NotBlank
     @Column(name = "nickname", unique = true)
     private String nickname;
 
     @Column(name = "password")
     private String password;
 
-    @NotNull
+    @NotBlank
     @Column(name = "email", unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     @Column(name = "role")
     private Role role;
 
-    /** 아래 두 개는 OAuth를 위한 필드.*/
+    /** 아래는 OAuth를 위한 필드.*/
     private String provider;
-    private String providerId;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     //@JsonIgnoreProperties("user")

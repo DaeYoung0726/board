@@ -19,13 +19,31 @@ public class AuthCodeService {
 
     private final MailService mailService;
     private final Map<String, VerificationData> codeMap = new ConcurrentHashMap<>();  // 메일 인증번호 확인용. 멀티스레드 측면에서 안전성 이점.
-    private static final int EXPIRATION_MINUTES = 3; // 유효 시간 3분
+    private static final int EMAIL_VERIFICATION_EXPIRATION_MINUTES = 3; // 이메일 인증 유효 시간 3분
+    private static final int EMAIL_RESEND_VALIDITY_MINUTES = 1; // 이메일 재전송 유효 시간 1분
+
 
     /* 회원가입 이메일 인증 번호. */
-    public void sendCodeToMail(String email) {
+    public boolean sendCodeToMail(String email) {
+
+        VerificationData storedData = codeMap.get(email);
+        if (storedData != null) {
+            LocalDateTime currentTime = LocalDateTime.now();
+            LocalDateTime expirationTime = storedData.getTimestamp().plusMinutes(EMAIL_RESEND_VALIDITY_MINUTES); // 이전에 보낸 메일로부터 1분이 지났는지 확인
+
+            if (currentTime.isBefore(expirationTime)) {
+                // 이전에 보낸 메일로부터 1분이 지나지 않았으면 메일을 보낼 수 없음
+                log.warn("Cannot send code to email {} as a recent code was sent less than a minute ago", email);
+                return false;
+            } else {
+                // 이전에 보낸 메일로부터 1분이 지났으면 해당 데이터 삭제
+                codeMap.remove(email);
+            }
+        }
         String code = createCode();
         mailService.selectMail("verify", email, code);
         codeMap.put(email, new VerificationData(code, LocalDateTime.now()));
+        return true;
     }
 
     /* 인증번호 만드는 메서드. */
@@ -46,9 +64,10 @@ public class AuthCodeService {
 
     /* 인증번호 확인 메서드. */
     public boolean verifiedCode(String email, String code) {
+
         VerificationData storedCode = codeMap.get(email);
         if(storedCode != null && storedCode.getCode().equals(code)) {
-            LocalDateTime expirationTime = storedCode.getTimestamp().plusMinutes(EXPIRATION_MINUTES);
+            LocalDateTime expirationTime = storedCode.getTimestamp().plusMinutes(EMAIL_VERIFICATION_EXPIRATION_MINUTES);
 
             if (LocalDateTime.now().isBefore(expirationTime)) {     // 유효 시간이 지나지 않았다면
                 codeMap.remove(email);      // 인증코드가 맞다면 인증코드 삭제.

@@ -46,8 +46,12 @@ public class UserController_REST {
     public ResponseEntity<String> sendMessage(@RequestParam("email") @Valid @Email String email) {
 
         try {
-            authCodeService.sendCodeToMail(email);
-            return ResponseEntity.ok("인증메일 보내기 성공.");
+            boolean codeSent = authCodeService.sendCodeToMail(email);
+            if (codeSent) {
+                return ResponseEntity.ok("인증메일 보내기 성공.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증메일 보내기 실패. 1분 후 재전송");
+            }
         } catch (Exception e) {
             log.error("Failed to send verification email: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증메일 보내기 실패.");

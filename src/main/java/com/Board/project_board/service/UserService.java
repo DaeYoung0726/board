@@ -25,8 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final MailService mailService;
-    private final Map<String, String> codeMap = new ConcurrentHashMap<>();  // 메일 인증번호 확인용.
 
     // 회원가입
     @Transactional
@@ -120,37 +118,4 @@ public class UserService {
         return false;
     }
 
-
-    /* 회원가입 이메일 인증 번호. */
-    public void sendCodeToMail(String email) {
-        String code = createCode();
-        mailService.selectMail("verify", email, code);
-        codeMap.put(email, code);
-    }
-
-    /* 인증번호 만드는 메서드. */
-    private String createCode() {
-
-        try {
-            Random random = SecureRandom.getInstanceStrong();   // 암호학적으로 안전한 무작위 수를 생성. 인증번호는 보안적으로 중요하기 SecureRandom 사용.
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < 6; i++) {
-                sb.append(random.nextInt(10));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            log.info("Failed to create secure random instance", e);
-            throw new RuntimeException("Failed to generate secure random number", e);
-        }
-    }
-
-    /* 인증번호 확인 메서드. */
-    public boolean verifiedCode(String email, String code) {
-        String storedCode = codeMap.get(email);
-        if(storedCode.equals(code)) {
-            codeMap.remove(email);      // 인증코드가 맞다면 인증코드 삭제.
-            return true;
-        } else
-            return false;
-    }
 }

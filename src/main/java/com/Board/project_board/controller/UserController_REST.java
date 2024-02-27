@@ -4,6 +4,7 @@ import com.Board.project_board.config.auth.PrincipalDetails;
 import com.Board.project_board.dto.UserDto;
 import com.Board.project_board.repository.UserRepository;
 import com.Board.project_board.service.UserService;
+import com.Board.project_board.service.mail.AuthCodeService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -25,6 +26,7 @@ public class UserController_REST {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserService userService;
+    private final AuthCodeService authCodeService;
 
     /* 회원 업데이트 */
     @PutMapping("/user/update")
@@ -44,7 +46,7 @@ public class UserController_REST {
     public ResponseEntity<String> sendMessage(@RequestParam("email") @Valid @Email String email) {
 
         try {
-            userService.sendCodeToMail(email);
+            authCodeService.sendCodeToMail(email);
             return ResponseEntity.ok("인증메일 보내기 성공.");
         } catch (Exception e) {
             log.error("Failed to send verification email: {}", e.getMessage(), e);
@@ -57,7 +59,7 @@ public class UserController_REST {
     public String verifyCode(@RequestParam("email") @Valid @Email String email,
                                              @RequestParam("code") String code) {
 
-        if(userService.verifiedCode(email, code))
+        if(authCodeService.verifiedCode(email, code))
             return "인증 성공";
         else
             return "인증 실패";

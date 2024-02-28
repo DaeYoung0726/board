@@ -72,14 +72,14 @@ public class UserService {
 
     /* 사용자 업데이트. */
     @Transactional
-    public void update(Long id, UserDto.UpdateRequest dto) {
+    public void update(String username, UserDto.UpdateRequest dto) {
 
-        log.info("Updating user with ID: {}", id);
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+        log.info("Updating user with Username: {}", username);
+        User user = userRepository.findByUserId(username).orElseThrow(() ->
+                new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
         user.update(dto.getNickname(), encPassword, dto.getEmail());
-        log.info("User updated successfully with ID: {}", id);
+        log.info("User updated successfully with Username: {}", username);
     }
 
     /* 사용자 등급 업데이트 */

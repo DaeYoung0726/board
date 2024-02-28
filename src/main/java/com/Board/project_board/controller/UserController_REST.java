@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,10 +32,12 @@ public class UserController_REST {
 
     /* 회원 업데이트 */
     @PutMapping("/user/update")
-    public ResponseEntity<String> modify(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<String> modify(Authentication authentication,
                                          @Validated @RequestBody UserDto.UpdateRequest user, HttpServletResponse response) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            userService.update(principalDetails.getUser().getId(), user);
+            userService.update(userDetails.getUsername(), user);
             response.sendRedirect("/logout");           // 이 방식도 있겠지만, html도 있을듯.
             return ResponseEntity.ok("회원 수정 완료.");
         } catch (Exception e) {

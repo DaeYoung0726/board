@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-    private final String updateTitle = "[board] 회원님의 등급이 업데이트 되었습니다.";
-    private final String updateText = "로 업데이트 되었습니다!";
-    private final String verifyTitle = "[board] 회원가입 인증 메일입니다.";
-    private final String verifyText = "인증번호 = ";
+    private static final String updateTitle = "[board] 회원님의 등급이 업데이트 되었습니다.";
+    private static final String updateText = "로 업데이트 되었습니다!";
+    private static final String verifyTitle = "[board] 회원가입 인증 메일입니다.";
+    private static final String verifyText = "인증번호 = ";
     @Value("${spring.mail.username}")
     private String emailUsername;
 

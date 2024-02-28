@@ -83,3 +83,4 @@ server:
     session:
       timeout: 1800
 # *참고 :application.yml에서 설정 가능한 최소 시간은 1분이며, 분단위로 설정해야 합니다.
+#  마지막 접근시간 후부터 시간을 체크함.

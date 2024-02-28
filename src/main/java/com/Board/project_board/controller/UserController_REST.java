@@ -59,7 +59,7 @@ public class UserController_REST {
     }
 
     /* 인증메일 확인 */
-    @GetMapping("/emails/verification")
+    @PostMapping("/emails/verification")
     public String verifyCode(@RequestParam("email") @Valid @Email String email,
                                              @RequestParam("code") String code) {
 

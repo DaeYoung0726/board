@@ -78,8 +78,12 @@ public class UserService {
         User user = userRepository.findByUserId(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
-        user.update(dto.getNickname(), encPassword, dto.getEmail());
-        log.info("User updated successfully with Username: {}", username);
+        if(!user.getUserId().equals(username))
+            throw new RuntimeException("권한이 없습니다.");
+        else {
+            user.update(dto.getNickname(), encPassword, dto.getEmail());
+            log.info("User updated successfully with Username: {}", username);
+        }
     }
 
     /* 사용자 등급 업데이트 */

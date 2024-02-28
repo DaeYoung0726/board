@@ -68,7 +68,7 @@ public class CommentController_REST {
             commentService.update(post_id, userDetails.getUsername(), id, dto);
             return ResponseEntity.ok("댓글 수정 완료.");
         } catch(Exception e) {
-            log.error("Failed to update comment with ID {} on post {}", id, post_id, e);
+            log.error("Error occurred while updating comment: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 수정 실패.");
         }
     }
@@ -83,7 +83,7 @@ public class CommentController_REST {
             commentService.delete(post_id, userDetails.getUsername(), id);
             return ResponseEntity.ok("댓글 삭제 완료.");
         } catch(Exception e) {
-            log.error("Failed to delete comment with ID {} on post {}", id, post_id, e);
+            log.error("Error occurred while deleting comment: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 삭제 실패.");
         }
     }

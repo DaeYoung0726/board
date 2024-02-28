@@ -110,7 +110,7 @@ public class PostController_REST {
             postService.update(postId, userDetails.getUsername(), dto);
             return ResponseEntity.ok("게시글 수정 완료.");
         } catch (Exception e) {
-            log.error("Failed to update post with ID: {}", postId, e);
+            log.error("Error occurred while updating post: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 실패.");
         }
     }
@@ -124,7 +124,7 @@ public class PostController_REST {
             postService.delete(postId, userDetails.getUsername());
             return ResponseEntity.ok("게시글 삭제 완료.");
         } catch (Exception e) {
-            log.error("Failed to delete post with ID: {}", postId, e);
+            log.error("Error occurred while deleting post: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 삭제 실패.");
         }
     }

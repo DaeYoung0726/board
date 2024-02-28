@@ -46,27 +46,6 @@ public class UserService {
         }
     }
 
-    /* 아이디 중복 확인. */
-    public boolean existsByUserId(String userId) {
-
-        log.info("Checking if user exists by user ID: {}", userId);
-        return userRepository.existsByUserId(userId);
-    }
-
-    /* 닉네임 중복 확인. */
-    public boolean existsByNickname(String nickname) {
-
-        log.info("Checking if user exists by nickname: {}", nickname);
-        return userRepository.existsByNickname(nickname);
-    }
-
-    /* 이메일 중복 확인 */
-    public boolean existsByEmail(String email) {
-
-        log.info("Checking if user exists by email: {}", email);
-        return userRepository.existsByEmail(email);
-    }
-
     /* 사용자 전체 읽기. */
     @Transactional(readOnly = true)
     public List<UserDto.Response> findAll() {
@@ -82,6 +61,13 @@ public class UserService {
 
         log.info("Finding user by ID: {}", id);
         return new UserDto.Response(userRepository.findById(id).orElse(null));
+    }
+
+    /* 아이디를 통한 사용자 읽기. */
+    @Transactional(readOnly = true)
+    public UserDto.Response findByUsername(String username) {
+        log.info("Finding user by Username: {}", username);
+        return new UserDto.Response(userRepository.findByUserId(username).orElse(null));
     }
 
     /* 사용자 업데이트. */
@@ -111,7 +97,7 @@ public class UserService {
 
     /* 등업 확인을 위한 메서드. */
     public boolean checkRoleUpgrade(UserDto.Response dto) {
-        if(dto.getRole().getValue().equals("ROLE_BRONZE") && dto.getPostSize() >= 1 && dto.getCommentSize() >= 2)
+        if(dto.getRole().getValue().equals("ROLE_BRONZE") && dto.getPostSize() >= 10 && dto.getCommentSize() >= 20)
             return true;
         if(dto.getRole().getValue().equals("ROLE_SILVER") && dto.getPostSize() >= 30 && dto.getCommentSize() >= 60)
             return true;

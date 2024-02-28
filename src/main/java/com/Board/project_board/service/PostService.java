@@ -27,11 +27,11 @@ public class PostService {
 
     /* 게시글 생성. */
     @Transactional
-    public Long save(PostDto.Request dto, String category_name, Long user_id) {
+    public Long save(PostDto.Request dto, String category_name, String username) {
 
         log.info("Saving post");
-        User user = userRepository.findById(user_id).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지 않습니다. id: " + user_id));
+        User user = userRepository.findByUserId(username).orElseThrow(() ->
+                new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         Category category = categoryRepository.findByName(category_name).orElseThrow(() ->
                 new IllegalArgumentException("해당 카테고리가 존재하지 않습니다. name: " + category_name));
         dto.setUser(user);
@@ -82,23 +82,27 @@ public class PostService {
 
     /* 게시글 삭제. */
     @Transactional
-    public void delete(Long id) {               // delete
+    public void delete(Long id, String username) {               // delete
 
         log.info("Deleting post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        postRepository.delete(post);
-        log.info("Post deleted successfully");
+        if(!post.getUser().getUserId().equals(username))
+            throw new RuntimeException("권한이 없습니다.");
+        else {
+            postRepository.delete(post);
+            log.info("Post deleted successfully");
+        }
     }
 
     /* 게시글 업데이트. */
     @Transactional
-    public void update(Long id, Long user_Id, PostDto.UpdateRequest dto) {  // update
+    public void update(Long id, String username, PostDto.UpdateRequest dto) {  // update
 
         log.info("Updating post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        if(post.getUser().getId() != user_Id)
+        if(!post.getUser().getUserId().equals(username))
             throw new RuntimeException("권한이 없습니다.");
         else {
             post.update(dto.getTitle(), dto.getContent());

@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,17 +30,18 @@ public class CommentController_REST {
 
     /* create */
     @PostMapping("/post/{id}/comment")
-    public ResponseEntity<String> save(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<String> save(@PathVariable Long id, Authentication authentication,
                                        @Validated @RequestBody CommentDto.Request comment) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
+            commentService.save(comment, userDetails.getUsername(), id);
 
-            commentService.save(comment, principalDetails.getUser().getId(), id);
-
-            UserDto.Response dto = userService.findById(principalDetails.getUser().getId());    // 회원 자동 등업 확인.
+            UserDto.Response dto = userService.findByUsername(userDetails.getUsername());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
                 userService.roleUpdate(dto.getId());
-                mailService.selectMail("update", principalDetails.getUser().getEmail(),
-                        String.valueOf(principalDetails.getUser().getRole().getNext()));
+                mailService.selectMail("update", dto.getEmail(),
+                        String.valueOf(dto.getRole().getNext()));
                 return ResponseEntity.ok("댓글 작성 + 회원 등업 완료.");
             }
             return ResponseEntity.ok("댓글 작성 완료.");
@@ -58,10 +61,11 @@ public class CommentController_REST {
     @PutMapping("/post/{post_id}/comment/{id}")
     public ResponseEntity<String> update(@PathVariable Long post_id, @PathVariable Long id,
                                          @Validated @RequestBody CommentDto.UpdateRequest dto,
-                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        try {
+                                         Authentication authentication) {
 
-            commentService.update(post_id,principalDetails.getUser().getId(), id, dto);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        try {
+            commentService.update(post_id, userDetails.getUsername(), id, dto);
             return ResponseEntity.ok("댓글 수정 완료.");
         } catch(Exception e) {
             log.error("Failed to update comment with ID {} on post {}", id, post_id, e);
@@ -71,10 +75,12 @@ public class CommentController_REST {
 
     /* delete */
     @DeleteMapping("/post/{post_id}/comment/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long post_id, @PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long post_id, @PathVariable Long id,
+                                         Authentication authentication) {
 
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            commentService.delete(post_id, id);
+            commentService.delete(post_id, userDetails.getUsername(), id);
             return ResponseEntity.ok("댓글 삭제 완료.");
         } catch(Exception e) {
             log.error("Failed to delete comment with ID {} on post {}", id, post_id, e);

@@ -13,7 +13,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,21 +38,22 @@ public class PostController_REST {
     @PostMapping("/post/{category_name}/write")
     public ResponseEntity<String> save(@Validated @RequestBody PostDto.Request post,
                                        @PathVariable String category_name,
-                                       @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        // @AuthenticationPrincipal을 사용해서 현재 인증된 로그인 정보를 객체로 만들어줌
-        try {
-            postService.save(post, category_name, principalDetails.getUser().getId());
+                                       Authentication authentication) {
 
-            UserDto.Response dto = userService.findById(principalDetails.getUser().getId());    // 회원 자동 등업 확인.
-            if(userService.checkRoleUpgrade(dto)) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        try {
+            postService.save(post, category_name, userDetails.getUsername());
+
+            UserDto.Response dto = userService.findByUsername(userDetails.getUsername());
+            if(userService.checkRoleUpgrade(dto)) {         // 회원 자동 등업 확인.
                 userService.roleUpdate(dto.getId());
-                mailService.selectMail("update", principalDetails.getUser().getEmail(),
-                        String.valueOf(principalDetails.getUser().getRole().getNext()));
+                mailService.selectMail("update", dto.getEmail(),
+                        String.valueOf(dto.getRole().getNext()));
                 return ResponseEntity.ok("게시글 작성 + 회원 등업 완료.");
             }
             return ResponseEntity.ok("게시글 작성 완료.");
         } catch (Exception e) {
-            log.error("Failed to save post for category: {} by user: {}", category_name, principalDetails.getUsername(), e);
+            log.error("Failed to save post for category: {} by user: {}", category_name, userDetails.getUsername(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 작성 실패.");
         }
     }
@@ -64,9 +67,10 @@ public class PostController_REST {
 
     // read post
     @GetMapping("/post/{postId}")
-    public PostDto.Response findById(@PathVariable Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public PostDto.Response findById(@PathVariable Long postId, Authentication authentication) {
         PostDto.Response post = postService.findById(postId);
-        if(post.getUser_id() != principalDetails.getUser().getId()) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        if(!post.getUser_id().equals(userDetails.getUsername())) {
             postService.updateView(postId);
         }
         return post;
@@ -99,10 +103,11 @@ public class PostController_REST {
     // update
     @PutMapping("/post/{postId}")
     public ResponseEntity<String> modify(@PathVariable Long postId, @Validated @RequestBody PostDto.UpdateRequest dto,
-                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                         Authentication authentication) {
 
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            postService.update(postId, principalDetails.getUser().getId(), dto);
+            postService.update(postId, userDetails.getUsername(), dto);
             return ResponseEntity.ok("게시글 수정 완료.");
         } catch (Exception e) {
             log.error("Failed to update post with ID: {}", postId, e);
@@ -112,10 +117,11 @@ public class PostController_REST {
 
     // delete
     @DeleteMapping("/post/{postId}")
-    public ResponseEntity<String> delete(@PathVariable Long postId) {
+    public ResponseEntity<String> delete(@PathVariable Long postId, Authentication authentication) {
 
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            postService.delete(postId);
+            postService.delete(postId, userDetails.getUsername());
             return ResponseEntity.ok("게시글 삭제 완료.");
         } catch (Exception e) {
             log.error("Failed to delete post with ID: {}", postId, e);

@@ -26,13 +26,13 @@ public class CommentService {
 
     /* 댓글 생성. */
     @Transactional
-    public Long save(CommentDto.Request dto, Long user_Id, Long post_Id) {
+    public Long save(CommentDto.Request dto, String username, Long post_Id) {
 
-        log.info("Creating a new comment for post with ID: {} by user with ID: {}", post_Id, user_Id);
+        log.info("Creating a new comment for post with ID: {} by user with Username: {}", post_Id, username);
         Post post = postRepository.findById(post_Id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + post_Id));;
-        User user = userRepository.findById(user_Id).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지 않습니다. id: " + user_Id));;
+        User user = userRepository.findByUserId(username).orElseThrow(() ->
+                new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));;
 
         dto.setPost(post);
         dto.setUser(user);
@@ -68,35 +68,32 @@ public class CommentService {
 
     /* 댓글 삭제. */
     @Transactional
-    public void delete(Long post_id, Long id) {
+    public void delete(Long post_id, String username, Long id) {
 
         log.info("Deleting comment with ID: {}", id);
         Comment comment = commentRepository.findByPostIdAndId(post_id, id).orElseThrow(() ->    // 왜 이걸로 할까 안해도 될듯? 짜핀 순차적으로 id가 지정됨.
                                                                                                 // 그리고 다른 사용자가 문제라면 권한 설정화면 됨.
                 new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id: " + id));
-        commentRepository.delete(comment);
-        log.info("Comment deleted successfully");
-    }
-
-    /* 전체 댓글 삭제. */
-    @Transactional
-    public void deleteAll() {
-
-        log.info("Deleting all comments");
-        commentRepository.deleteAll();
-        log.info("All comments deleted successfully");
+        if(!comment.getUser().getUserId().equals(username))
+            throw new RuntimeException("권한이 없습니다.");
+        else {
+            commentRepository.delete(comment);
+            log.info("Comment deleted successfully");
+        }
     }
 
     /* 댓글 업데이트. */
     @Transactional
-    public void update(Long post_id, Long user_id, Long id, CommentDto.UpdateRequest dto) {  // update
+    public void update(Long post_id, String username, Long id, CommentDto.UpdateRequest dto) {  // update
 
         log.info("Updating comment with ID: {}", id);
         Comment comment = commentRepository.findByPostIdAndId(post_id, id).orElseThrow(() ->
                 new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id: " + id));
-        if(comment.getUser().getId() != user_id)
+        if(!comment.getUser().getUserId().equals(username))
             throw new RuntimeException("권한이 없습니다.");
-        comment.update(dto.getContent());
-        log.info("Comment updated successfully");
+        else {
+            comment.update(dto.getContent());
+            log.info("Comment updated successfully");
+        }
     }
 }

@@ -32,12 +32,11 @@ public class UserController_REST {
 
     /* 회원 업데이트 */
     @PutMapping("/user/update")
-    public ResponseEntity<String> modify(Authentication authentication,
+    public ResponseEntity<String> modify(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                          @Validated @RequestBody UserDto.UpdateRequest user, HttpServletResponse response) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            userService.update(userDetails.getUsername(), user);
+            userService.update(principalDetails.getUsername(), user);
             response.sendRedirect("/logout");           // 이 방식도 있겠지만, html도 있을듯.
             return ResponseEntity.ok("회원 수정 완료.");
         } catch (Exception e) {

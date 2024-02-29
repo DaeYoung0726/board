@@ -87,7 +87,7 @@ public class PostService {
         log.info("Deleting post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        if(!post.getUser().getUserId().equals(username))
+        if(!verifyAuthenticationByUsername(username, post.getUser().getUserId()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             postRepository.delete(post);
@@ -102,7 +102,7 @@ public class PostService {
         log.info("Updating post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        if(!post.getUser().getUserId().equals(username))
+        if(!verifyAuthenticationByUsername(username, post.getUser().getUserId()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             post.update(dto.getTitle(), dto.getContent());
@@ -186,4 +186,8 @@ public class PostService {
         return 0;
     }
 
+    /* 자신의 권한인지 확인 */
+    private boolean verifyAuthenticationByUsername(String expectedUsername, String actualUsername) {
+        return actualUsername.equals(expectedUsername);
+    }
 }

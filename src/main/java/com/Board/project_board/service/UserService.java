@@ -78,7 +78,7 @@ public class UserService {
         User user = userRepository.findByUserId(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
-        if(!user.getUserId().equals(username))
+        if(!verifyAuthenticationByUsername(username, user.getUserId()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             user.update(dto.getNickname(), encPassword, dto.getEmail());
@@ -108,4 +108,8 @@ public class UserService {
         return false;
     }
 
+    /* 자신의 권한인지 확인 */
+    private boolean verifyAuthenticationByUsername(String expectedUsername, String actualUsername) {
+        return actualUsername.equals(expectedUsername);
+    }
 }

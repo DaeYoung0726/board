@@ -38,13 +38,12 @@ public class PostController_REST {
     @PostMapping("/post/{category_name}/write")
     public ResponseEntity<String> save(@Validated @RequestBody PostDto.Request post,
                                        @PathVariable String category_name,
-                                       Authentication authentication) {
+                                       @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            postService.save(post, category_name, userDetails.getUsername());
+            postService.save(post, category_name, principalDetails.getUsername());
 
-            UserDto.Response dto = userService.findByUsername(userDetails.getUsername());
+            UserDto.Response dto = userService.findByUsername(principalDetails.getUsername());
             if(userService.checkRoleUpgrade(dto)) {         // 회원 자동 등업 확인.
                 userService.roleUpdate(dto.getId());
                 mailService.selectMail("update", dto.getEmail(),
@@ -53,7 +52,7 @@ public class PostController_REST {
             }
             return ResponseEntity.ok("게시글 작성 완료.");
         } catch (Exception e) {
-            log.error("Failed to save post for category: {} by user: {}", category_name, userDetails.getUsername(), e);
+            log.error("Failed to save post for category: {} by user: {}", category_name, principalDetails.getUsername(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 작성 실패.");
         }
     }
@@ -103,11 +102,10 @@ public class PostController_REST {
     // update
     @PutMapping("/post/{postId}")
     public ResponseEntity<String> modify(@PathVariable Long postId, @Validated @RequestBody PostDto.UpdateRequest dto,
-                                         Authentication authentication) {
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            postService.update(postId, userDetails.getUsername(), dto);
+            postService.update(postId, principalDetails.getUsername(), dto);
             return ResponseEntity.ok("게시글 수정 완료.");
         } catch (Exception e) {
             log.error("Error occurred while updating post: {}", e.getMessage());
@@ -117,11 +115,11 @@ public class PostController_REST {
 
     // delete
     @DeleteMapping("/post/{postId}")
-    public ResponseEntity<String> delete(@PathVariable Long postId, Authentication authentication) {
+    public ResponseEntity<String> delete(@PathVariable Long postId,
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            postService.delete(postId, userDetails.getUsername());
+            postService.delete(postId, principalDetails.getUsername());
             return ResponseEntity.ok("게시글 삭제 완료.");
         } catch (Exception e) {
             log.error("Error occurred while deleting post: {}", e.getMessage());
@@ -129,6 +127,7 @@ public class PostController_REST {
         }
     }
 
+    /* 좋아요 증가 or 감소 */
     @PatchMapping("/post/{postId}/update-like")
     public ResponseEntity<String> updateLike(@PathVariable Long postId, @RequestParam boolean increase) {
 
@@ -144,6 +143,7 @@ public class PostController_REST {
         }
     }
 
+    /* 신고 시스템 */
     @PatchMapping("/post/{postId}/update-report")
     public ResponseEntity<String> updateReport(@PathVariable Long postId) {
 

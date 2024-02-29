@@ -30,14 +30,13 @@ public class CommentController_REST {
 
     /* create */
     @PostMapping("/post/{id}/comment")
-    public ResponseEntity<String> save(@PathVariable Long id, Authentication authentication,
+    public ResponseEntity<String> save(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principalDetails,
                                        @Validated @RequestBody CommentDto.Request comment) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            commentService.save(comment, userDetails.getUsername(), id);
+            commentService.save(comment, principalDetails.getUsername(), id);
 
-            UserDto.Response dto = userService.findByUsername(userDetails.getUsername());    // 회원 자동 등업 확인.
+            UserDto.Response dto = userService.findByUsername(principalDetails.getUsername());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
                 userService.roleUpdate(dto.getId());
                 mailService.selectMail("update", dto.getEmail(),
@@ -61,11 +60,10 @@ public class CommentController_REST {
     @PutMapping("/post/{post_id}/comment/{id}")
     public ResponseEntity<String> update(@PathVariable Long post_id, @PathVariable Long id,
                                          @Validated @RequestBody CommentDto.UpdateRequest dto,
-                                         Authentication authentication) {
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            commentService.update(post_id, userDetails.getUsername(), id, dto);
+            commentService.update(post_id, principalDetails.getUsername(), id, dto);
             return ResponseEntity.ok("댓글 수정 완료.");
         } catch(Exception e) {
             log.error("Error occurred while updating comment: {}", e.getMessage());
@@ -76,11 +74,10 @@ public class CommentController_REST {
     /* delete */
     @DeleteMapping("/post/{post_id}/comment/{id}")
     public ResponseEntity<String> delete(@PathVariable Long post_id, @PathVariable Long id,
-                                         Authentication authentication) {
+                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         try {
-            commentService.delete(post_id, userDetails.getUsername(), id);
+            commentService.delete(post_id, principalDetails.getUsername(), id);
             return ResponseEntity.ok("댓글 삭제 완료.");
         } catch(Exception e) {
             log.error("Error occurred while deleting comment: {}", e.getMessage());

@@ -1,10 +1,12 @@
 package com.Board.project_board.config;
 
 
+import com.Board.project_board.config.converter.StringToRoleConverter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.view.MustacheViewResolver;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,6 +22,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         resolver.setSuffix(".html");            // .html파일을 머스태치가 인식
 
         registry.viewResolver(resolver);   // resolver로 뷰리졸버로 등록.
+    }
+
+    /* String -> Enum(Role) 변경을 위한 converter 등록*/
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToRoleConverter());
     }
 
 }

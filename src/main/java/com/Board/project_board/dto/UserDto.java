@@ -31,6 +31,7 @@ public class UserDto {
         private String password;
         @NotBlank(message = "이메일은 필수 입력 값입니다.")
         private String email;
+        private Role role;
 
         // dto -> entity
         public User toEntity() {
@@ -40,7 +41,7 @@ public class UserDto {
                     .nickname(nickname)
                     .password(password)
                     .email(email)
-                    .role(Role.BRONZE)
+                    .role(role)
                     .build();
 
             return user;
@@ -53,7 +54,7 @@ public class UserDto {
                     .nickname(oAuth2UserInfo.getNickname())
                     .password(bCryptPasswordEncoder.encode(oAuth2UserInfo.getName()))
                     .email(oAuth2UserInfo.getEmail())
-                    .role(Role.BRONZE)
+                    .role(role)
                     .provider(oAuth2UserInfo.getProvider())
                     .build();
             return user;

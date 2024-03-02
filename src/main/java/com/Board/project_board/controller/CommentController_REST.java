@@ -29,12 +29,12 @@ public class CommentController_REST {
     private final MailService mailService;
 
     /* create */
-    @PostMapping("/post/{id}/comment")
-    public ResponseEntity<String> save(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principalDetails,
+    @PostMapping("/post/{post_id}/comment")
+    public ResponseEntity<String> save(@PathVariable Long post_id, @AuthenticationPrincipal PrincipalDetails principalDetails,
                                        @Validated @RequestBody CommentDto.Request comment) {
 
         try {
-            commentService.save(comment, principalDetails.getUsername(), id);
+            commentService.save(comment, principalDetails.getUsername(), post_id);
 
             UserDto.Response dto = userService.findByUsername(principalDetails.getUsername());    // 회원 자동 등업 확인.
             if(userService.checkRoleUpgrade(dto)) {
@@ -45,15 +45,15 @@ public class CommentController_REST {
             }
             return ResponseEntity.ok("댓글 작성 완료.");
         } catch(Exception e) {
-            log.error("Failed to save comment on post {}", id, e);
+            log.error("Failed to save comment on post {}", post_id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 작성 실패.");
         }
     }
 
     /* read */
-    @GetMapping("/post/{id}/comment")
-    public List<CommentDto.Response> read(@PathVariable Long id) {
-        return commentService.findAll(id);
+    @GetMapping("/post/{post_id}/comment")
+    public List<CommentDto.Response> read(@PathVariable Long post_id) {
+        return commentService.findAll(post_id);
     }
 
     /* update */

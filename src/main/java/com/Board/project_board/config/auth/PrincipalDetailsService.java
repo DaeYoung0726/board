@@ -18,7 +18,7 @@ public class PrincipalDetailsService implements UserDetailsService {
         if(username == null || username.equals("")) {
             throw new UsernameNotFoundException(username);
         }
-        User userEntity = userRepository.findByUserId(username).orElse(null);
+        User userEntity = userRepository.findByUsername(username).orElse(null);
         if(userEntity == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }

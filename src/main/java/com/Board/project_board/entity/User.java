@@ -1,15 +1,10 @@
 package com.Board.project_board.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter @Setter
 @NoArgsConstructor
@@ -28,8 +23,8 @@ public class User extends BaseTimeEntity {
     private String name;
 
     @NotBlank
-    @Column(name = "userid", unique = true)
-    private String userId;
+    @Column(name = "username", unique = true)
+    private String username;
 
     @NotBlank
     @Column(name = "nickname", unique = true)

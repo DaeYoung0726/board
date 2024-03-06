@@ -24,7 +24,7 @@ public class UserDto {
         @NotBlank(message = "이름은 필수 입력 값입니다.")
         private String name;
         @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{4,20}$", message = "아이디는 특수문자를 제외한 4~20자리여야 합니다.")
-        private String userId;
+        private String username;
         @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9-_]{2,10}$", message = "닉네임은 특수문자를 제외한 2~10자리여야 합니다.")
         private String nickname;
         @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W).{8,16}", message = "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.")
@@ -37,7 +37,7 @@ public class UserDto {
         public User toEntity() {
             User user = User.builder()
                     .name(name)
-                    .userId(userId)
+                    .username(username)
                     .nickname(nickname)
                     .password(password)
                     .email(email)
@@ -50,7 +50,7 @@ public class UserDto {
         public User toEntity(OAuth2UserInfo oAuth2UserInfo, BCryptPasswordEncoder bCryptPasswordEncoder) {  // OAuth2를 위해.
             User user = User.builder()
                     .name(oAuth2UserInfo.getName())
-                    .userId(oAuth2UserInfo.getUserId())
+                    .username(oAuth2UserInfo.getUsername())
                     .nickname(oAuth2UserInfo.getNickname())
                     .password(bCryptPasswordEncoder.encode(oAuth2UserInfo.getName()))
                     .email(oAuth2UserInfo.getEmail())
@@ -79,7 +79,7 @@ public class UserDto {
     public static class Response {
         private final Long id;
         private final String name;
-        private final String userId;
+        private final String username;
         private final String nickname;
         private final String email;
         private final Role role;
@@ -95,7 +95,7 @@ public class UserDto {
         public Response(User user) {
             this.id = user.getId();
             this.name = user.getName();
-            this.userId = user.getUserId();
+            this.username = user.getUsername();
             this.nickname = user.getNickname();
             this.email = user.getEmail();
             this.role = user.getRole();

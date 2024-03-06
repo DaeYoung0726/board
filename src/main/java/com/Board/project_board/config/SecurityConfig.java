@@ -50,7 +50,6 @@ public class SecurityConfig {
                         formLogin
                                 .loginPage("/loginForm")      //  사용자를 로그인 페이지로 리다이렉션하는 데 사용
                                 // /admin, /user, /manager 하면 /login으로 이동
-                                .usernameParameter("userId")
                                 .loginProcessingUrl("/login") // /login 주소가 호출되면 시큐리티가 낚아채서 대신 !!로그인 진행.
                                 .failureHandler(customAuthFailureHandler)     // 로그인 에러 확인을 위한 class.
                                 .defaultSuccessUrl("/"))   // 로그인하면 이 공간으로 감. (여기서는 "/"으로)

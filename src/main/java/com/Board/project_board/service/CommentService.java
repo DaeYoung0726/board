@@ -31,7 +31,7 @@ public class CommentService {
         log.info("Creating a new comment for post with ID: {} by user with Username: {}", post_Id, username);
         Post post = postRepository.findById(post_Id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + post_Id));;
-        User user = userRepository.findByUserId(username).orElseThrow(() ->
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));;
 
         dto.setPost(post);
@@ -74,7 +74,7 @@ public class CommentService {
         Comment comment = commentRepository.findByPostIdAndId(post_id, id).orElseThrow(() ->    // 왜 이걸로 할까 안해도 될듯? 짜핀 순차적으로 id가 지정됨.
                                                                                                 // 그리고 다른 사용자가 문제라면 권한 설정화면 됨.
                 new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id: " + id));
-        if(!verifyAuthenticationByUsername(username,comment.getUser().getUserId()))
+        if(!verifyAuthenticationByUsername(username, comment.getUser().getUsername()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             commentRepository.delete(comment);
@@ -89,7 +89,7 @@ public class CommentService {
         log.info("Updating comment with ID: {}", id);
         Comment comment = commentRepository.findByPostIdAndId(post_id, id).orElseThrow(() ->
                 new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id: " + id));
-        if(!verifyAuthenticationByUsername(username,comment.getUser().getUserId()))
+        if(!verifyAuthenticationByUsername(username,comment.getUser().getUsername()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             comment.update(dto.getContent());

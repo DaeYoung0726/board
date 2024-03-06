@@ -30,7 +30,7 @@ public class PostService {
     public Long save(PostDto.Request dto, String category_name, String username) {
 
         log.info("Saving post");
-        User user = userRepository.findByUserId(username).orElseThrow(() ->
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         Category category = categoryRepository.findByName(category_name).orElseThrow(() ->
                 new IllegalArgumentException("해당 카테고리가 존재하지 않습니다. name: " + category_name));
@@ -87,7 +87,7 @@ public class PostService {
         log.info("Deleting post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        if(!verifyAuthenticationByUsername(username, post.getUser().getUserId()))
+        if(!verifyAuthenticationByUsername(username, post.getUser().getUsername()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             postRepository.delete(post);
@@ -102,7 +102,7 @@ public class PostService {
         log.info("Updating post with ID: {}", id);
         Post post = postRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + id));
-        if(!verifyAuthenticationByUsername(username, post.getUser().getUserId()))
+        if(!verifyAuthenticationByUsername(username, post.getUser().getUsername()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             post.update(dto.getTitle(), dto.getContent());

@@ -29,7 +29,7 @@ public class UserService {
     // 회원가입
     @Transactional
     public Long create(UserDto.Request dto) {
-        log.info("Creating user with username: {}", dto.getUserId());
+        log.info("Creating user with username: {}", dto.getUsername());
         dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
         User user = dto.toEntity();
 
@@ -67,7 +67,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDto.Response findByUsername(String username) {
         log.info("Finding user by Username: {}", username);
-        return new UserDto.Response(userRepository.findByUserId(username).orElse(null));
+        return new UserDto.Response(userRepository.findByUsername(username).orElse(null));
     }
 
     /* 사용자 업데이트. */
@@ -75,10 +75,10 @@ public class UserService {
     public void update(String username, UserDto.UpdateRequest dto) {
 
         log.info("Updating user with Username: {}", username);
-        User user = userRepository.findByUserId(username).orElseThrow(() ->
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
         String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
-        if(!verifyAuthenticationByUsername(username, user.getUserId()))
+        if(!verifyAuthenticationByUsername(username, user.getUsername()))
             throw new RuntimeException("권한이 없습니다.");
         else {
             user.update(dto.getNickname(), encPassword, dto.getEmail());
@@ -91,7 +91,7 @@ public class UserService {
     public String roleUpdate(String username) {
 
         log.info("Updating user role with username: {}", username);
-        User user = userRepository.findByUserId(username).orElseThrow(() ->
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
 
         if(user.getRole().getNext() != null)

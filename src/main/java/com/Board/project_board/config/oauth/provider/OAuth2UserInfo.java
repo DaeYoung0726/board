@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public interface OAuth2UserInfo {
 
     String getProvider();
-    String getUserId();
+    String getUsername();
     String getName();
     String getNickname();
     String getEmail();

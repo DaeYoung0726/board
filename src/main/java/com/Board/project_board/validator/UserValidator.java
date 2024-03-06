@@ -23,7 +23,7 @@ public class UserValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         UserDto.Request dto = (UserDto.Request) target;
-        if(userRepository.existsByUserId(dto.getUserId()))
+        if(userRepository.existsByUsername(dto.getUsername()))
             errors.rejectValue("userId", "이미 존재하는 아이디 입니다.");
         if(userRepository.existsByEmail(dto.getEmail()))
             errors.rejectValue("email", "이미 존재하는 이메일 입니다.");

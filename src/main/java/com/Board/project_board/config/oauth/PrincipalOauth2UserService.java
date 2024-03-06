@@ -59,7 +59,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     }
 
     private User saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
-        User user = userRepository.findByUserId(oAuth2UserInfo.getEmail())
+        User user = userRepository.findByUsername(oAuth2UserInfo.getEmail())
                 .map(User::updateModifiedDateIfUserExists)      // 이미 존재한다면, 최근 접근 시간 수정
                 .orElse(new UserDto.Request().toEntity(oAuth2UserInfo, bCryptPasswordEncoder)); // 없다면 새로 만들기.
 

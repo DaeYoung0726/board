@@ -2,10 +2,9 @@ package com.Board.project_board.config.converter;
 
 import com.Board.project_board.entity.Role;
 import org.springframework.core.convert.converter.Converter;
-
 public class StringToRoleConverter implements Converter<String, Role> {
 
-    /* String -> Enum(Role)를 위한 Converter */
+    /* String -> Enum(Role)를 위한 Converter. 기본적으로 Integer, Boolean, Enum 등은 스프링에서 자동처리 된다고 함.*/
     @Override
     public Role convert(String source) {
         try {

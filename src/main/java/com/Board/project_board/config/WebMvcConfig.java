@@ -25,9 +25,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /* String -> Enum(Role) 변경을 위한 converter 등록*/
-    @Override
+    /*@Override         Spring은 기본적으로 String을 enum으로 바꿔주는 converter 있음.
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToRoleConverter());
-    }
+    }*/
 
 }

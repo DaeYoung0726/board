@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,11 +44,10 @@ public class PostController_REST {
         try {
             postService.save(post, category_name, principalDetails.getUsername());
 
-            UserDto.Response dto = userService.findByUsername(principalDetails.getUsername());
-            if(userService.checkRoleUpgrade(dto)) {         // 회원 자동 등업 확인.
-                userService.roleUpdate(dto.getId());
-                mailService.selectMail("update", dto.getEmail(),
-                        String.valueOf(dto.getRole().getNext()));
+            if(userService.checkRoleUpgrade(principalDetails.getUsername())) {         // 회원 자동 등업 확인.
+                String updatedRole = userService.roleUpdate(principalDetails.getUsername());
+                mailService.selectMail("update",
+                        principalDetails.getUser().getEmail(), updatedRole);
                 return ResponseEntity.ok("게시글 작성 + 회원 등업 완료.");
             }
             return ResponseEntity.ok("게시글 작성 완료.");

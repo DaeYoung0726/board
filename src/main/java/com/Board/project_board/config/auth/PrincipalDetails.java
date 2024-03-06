@@ -34,7 +34,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collect = new ArrayList<>();
-        collect.add(() -> "ROLE_" + user.getRole());    // "ROLE_"없으면 security가 권한을 인식 못함. 그래서 ROLE_ 해줘야함.
+        collect.add(() -> user.getRole().getValue());
         return collect;
     }
 

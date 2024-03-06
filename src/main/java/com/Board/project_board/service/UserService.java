@@ -88,22 +88,28 @@ public class UserService {
 
     /* 사용자 등급 업데이트 */
     @Transactional
-    public void roleUpdate(Long id) {
+    public String roleUpdate(String username) {
 
-        log.info("Updating user role with ID: {}", id);
-        User user = userRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+        log.info("Updating user role with username: {}", username);
+        User user = userRepository.findByUserId(username).orElseThrow(() ->
+                new IllegalArgumentException("해당 회원이 존재하지 않습니다. username: " + username));
 
         if(user.getRole().getNext() != null)
             user.roleUpdate(user.getRole().getNext());
-        log.info("User role updated successfully with ID: {}", id);
+        log.info("User role updated successfully with username: {}", username);
+
+        return String.valueOf(user.getRole());
     }
 
     /* 등업 확인을 위한 메서드. */
-    public boolean checkRoleUpgrade(UserDto.Response dto) {
-        if(dto.getRole().getValue().equals("ROLE_BRONZE") && dto.getPostSize() >= 10 && dto.getCommentSize() >= 20)
+    @Transactional(readOnly = true)
+    public boolean checkRoleUpgrade(String username) {
+
+        UserDto.Response user = findByUsername(username);
+
+        if(user.getRole().getValue().equals("ROLE_BRONZE") && user.getPostSize() >= 1 && user.getCommentSize() >= 2)
             return true;
-        if(dto.getRole().getValue().equals("ROLE_SILVER") && dto.getPostSize() >= 30 && dto.getCommentSize() >= 60)
+        if(user.getRole().getValue().equals("ROLE_SILVER") && user.getPostSize() >= 30 && user.getCommentSize() >= 60)
             return true;
         return false;
     }

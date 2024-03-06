@@ -36,11 +36,10 @@ public class CommentController_REST {
         try {
             commentService.save(comment, principalDetails.getUsername(), post_id);
 
-            UserDto.Response dto = userService.findByUsername(principalDetails.getUsername());    // 회원 자동 등업 확인.
-            if(userService.checkRoleUpgrade(dto)) {
-                userService.roleUpdate(dto.getId());
-                mailService.selectMail("update", dto.getEmail(),
-                        String.valueOf(dto.getRole().getNext()));
+            if(userService.checkRoleUpgrade(principalDetails.getUsername())) {      // 회원 자동 등업 확인.
+                String updatedRole = userService.roleUpdate(principalDetails.getUsername());
+                mailService.selectMail("update",
+                        principalDetails.getUser().getEmail(), updatedRole);
                 return ResponseEntity.ok("댓글 작성 + 회원 등업 완료.");
             }
             return ResponseEntity.ok("댓글 작성 완료.");

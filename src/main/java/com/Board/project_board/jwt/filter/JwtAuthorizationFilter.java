@@ -30,6 +30,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String requestUri = request.getRequestURI();
+
+        if (requestUri.matches("^\\/login(?:\\/.*)?$")) {      // "/login" or "/login/**"는 필터 거름.
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {      // "/oauth2" or "/oauth2/**"는 필터 거름.
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String access = request.getHeader(ACCESS_HEADER_VALUE);
 
         if(access == null || !access.startsWith(TOKEN_PREFIX)) {

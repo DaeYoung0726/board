@@ -7,6 +7,7 @@ import com.Board.project_board.config.oauth.PrincipalOauth2UserService;
 import com.Board.project_board.jwt.JwtUtil;
 import com.Board.project_board.jwt.filter.JwtAuthenticationFilter;
 import com.Board.project_board.jwt.filter.JwtAuthorizationFilter;
+import com.Board.project_board.jwt.oauth2.OAuth2SuccessHandler;
 import com.Board.project_board.jwt.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final AuthService authService;
     private final CustomLogoutHandler customLogoutHandler;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,7 +63,7 @@ public class SecurityConfig {
                         oauth2
                                 .userInfoEndpoint(userInfoEndpointConfig ->
                                         userInfoEndpointConfig.userService(principalOauth2UserService))
-                                .successHandler())
+                                .successHandler(oAuth2SuccessHandler))
 
                 .addFilterAt(new JwtAuthenticationFilter(
                         authenticationManager(authenticationConfiguration), jwtUtil, authService, customAuthFailureHandler),

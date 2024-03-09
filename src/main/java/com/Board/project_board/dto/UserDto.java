@@ -41,7 +41,7 @@ public class UserDto {
                     .nickname(nickname)
                     .password(password)
                     .email(email)
-                    .role(role)
+                    .role(Role.BRONZE)
                     .build();
 
             return user;
@@ -54,7 +54,7 @@ public class UserDto {
                     .nickname(oAuth2UserInfo.getNickname())
                     .password(bCryptPasswordEncoder.encode(oAuth2UserInfo.getName()))
                     .email(oAuth2UserInfo.getEmail())
-                    .role(role)
+                    .role(Role.BRONZE)
                     .provider(oAuth2UserInfo.getProvider())
                     .build();
             return user;

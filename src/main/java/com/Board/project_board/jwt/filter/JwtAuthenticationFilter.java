@@ -50,8 +50,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        String accessToken = jwtUtil.generateAccessToken(principalDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(principalDetails);
+        String accessToken = jwtUtil.generateAccessToken(principalDetails);     // Access Token 발급
+        String refreshToken = jwtUtil.generateRefreshToken(principalDetails);   // Refresh Token 발급
 
         String username = principalDetails.getUsername();
 
@@ -68,6 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     }
 
+    /* Refresh Token db저장 및 key값 가져오기 */
     private String getRefreshUUID(String refreshToken, String username) {
         AuthDTO authDTO = AuthDTO.builder()
                 .token(refreshToken)
@@ -77,6 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return authService.save(authDTO);
     }
 
+    /* 쿠키 생성 */
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
@@ -87,6 +89,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return cookie;
     }
 
+    /* 로그인 실패 시 */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         customAuthFailureHandler.onAuthenticationFailure(request, response, failed);

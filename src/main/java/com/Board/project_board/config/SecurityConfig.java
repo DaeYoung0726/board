@@ -57,11 +57,17 @@ public class SecurityConfig {
                 .sessionManagement((session) ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                .oauth2Login(oauth2 ->
+                        oauth2
+                                .userInfoEndpoint(userInfoEndpointConfig ->
+                                        userInfoEndpointConfig.userService(principalOauth2UserService))
+                                .successHandler())
+
                 .addFilterAt(new JwtAuthenticationFilter(
                         authenticationManager(authenticationConfiguration), jwtUtil, authService, customAuthFailureHandler),
                         UsernamePasswordAuthenticationFilter.class)
 
-                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), JwtAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
 
                 .logout(logout ->
                         logout.addLogoutHandler(customLogoutHandler));

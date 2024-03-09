@@ -2,16 +2,23 @@ package com.Board.project_board.config;
 
 import com.Board.project_board.config.auth.PrincipalDetailsService;
 import com.Board.project_board.config.handler.CustomAuthFailureHandler;
+import com.Board.project_board.config.handler.CustomLogoutHandler;
 import com.Board.project_board.config.oauth.PrincipalOauth2UserService;
+import com.Board.project_board.jwt.JwtUtil;
+import com.Board.project_board.jwt.filter.JwtAuthenticationFilter;
+import com.Board.project_board.jwt.filter.JwtAuthorizationFilter;
+import com.Board.project_board.jwt.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -22,8 +29,54 @@ public class SecurityConfig {
     private final PrincipalOauth2UserService principalOauth2UserService;    // OAuth2 로그인을 위해.
     private final PrincipalDetailsService principalDetailsService;          // 로그인 기억을 위해.
     private final CustomAuthFailureHandler customAuthFailureHandler;        // 로그인 에러를 위해.
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtUtil jwtUtil;
+    private final AuthService authService;
+    private final CustomLogoutHandler customLogoutHandler;
 
     @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+
+                .formLogin(AbstractHttpConfigurer::disable)     // jwt 토큰을 받을 것이기에. fromLogin, httpBasic 비활성화.
+
+                .httpBasic(AbstractHttpConfigurer::disable)
+
+                .authorizeHttpRequests(authorize ->         //  HTTP 요청에 대한 인가 규칙을 설정
+                        authorize                   // 아래와 같이 전체적으로 권한을 설정.
+                                // 위에 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)이거는 특정 사이트만.
+                                // 아래 인가 먼저 등록한 것부터 동작한다.
+                                .requestMatchers(new AntPathRequestMatcher("/user/**")).authenticated() // 인증된(authenticated) 사용자에게만 허용
+                                .requestMatchers(new AntPathRequestMatcher("/user_silver/**")).hasAnyRole("ADMIN", "MANAGER", "SILVER", "GOLD")
+                                .requestMatchers(new AntPathRequestMatcher("/user_gold/**")).hasAnyRole("ADMIN", "MANAGER", "GOLD")
+                                .requestMatchers(new AntPathRequestMatcher("/manager/**")).hasAnyRole("ADMIN", "MANAGER") //"ADMIN" 또는 "MANAGER" 역할을 가진 사용자에게만 허용
+                                .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN") // "ADMIN" 역할을 가진 사용자에게만 허용
+                                .anyRequest().permitAll())   // 나머지 요청에 대해서는 모든 권한을 허용
+
+                .sessionManagement((session) ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .addFilterAt(new JwtAuthenticationFilter(
+                        authenticationManager(authenticationConfiguration), jwtUtil, authService, customAuthFailureHandler),
+                        UsernamePasswordAuthenticationFilter.class)
+
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), JwtAuthenticationFilter.class)
+
+                .logout(logout ->
+                        logout.addLogoutHandler(customLogoutHandler));
+
+        return http.build();
+    }
+
+    //AuthenticationManager Bean 등록
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+
+        return configuration.getAuthenticationManager();
+    }
+
+    /*@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)       // CSRF 공격 방지를 위한 기능을 비활성화. csrf 토큰도 같이 보내야 로그인 되기에 비활성화 함.
@@ -79,10 +132,10 @@ public class SecurityConfig {
                                                 .userService(principalOauth2UserService)));  // 사용자 정보를 가져오는 서비스를 설정.
                                         // principalOauth2UserService 여기에 후처리 등록.
 
-        /** OAuth 2.0를 사용하여 로그인할 때 사용자 정보 엔드포인트를 구성하는 이유는 사용자의 정보를 얻어오기 위해서.
-         OAuth 2.0 프로토콜은 로그인 후에도 사용자에 대한 추가 정보가 필요한 경우가 많기 때문에 이 정보를 얻어오기 위해 사용자 정보 엔드포인트를 사용. */
+        *//** OAuth 2.0를 사용하여 로그인할 때 사용자 정보 엔드포인트를 구성하는 이유는 사용자의 정보를 얻어오기 위해서.
+         OAuth 2.0 프로토콜은 로그인 후에도 사용자에 대한 추가 정보가 필요한 경우가 많기 때문에 이 정보를 얻어오기 위해 사용자 정보 엔드포인트를 사용. *//*
 
         return http.build();
-    }
+    }*/
 }
 
